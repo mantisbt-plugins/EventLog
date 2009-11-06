@@ -67,6 +67,17 @@ class EventLogPlugin extends MantisPlugin {
 					timestamp		T		NOTNULL
 				" )
 			),
+			array( 'DropTableSQL',
+				array( plugin_table( 'events' ) )
+			),
+			array( 'CreateTableSQL',
+				array( plugin_table( 'events' ), "
+					id				I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+					user_id			I		NOTNULL UNSIGNED DEFAULT '0',
+					event			C(250)	NOTNULL,
+					timestamp		I UNSIGNED NOTNULL DEFAULT '1'
+				" )
+			),
 		);
 	}
 
