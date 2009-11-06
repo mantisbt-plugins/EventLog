@@ -52,7 +52,13 @@ function EventLog_add( $p_event_text ) {
 
 	$t_query = "INSERT INTO $t_events_table ( user_id, event, timestamp ) VALUES (" . db_param( 0 ) . ", " . db_param( 1 ) . ", '" . db_now() . "')";
 
-	db_query_bound( $t_query, array( auth_get_current_user_id(), trim( $p_event_text ) ) );
+	if ( auth_is_user_authenticated() ) {
+		$t_user_id = auth_get_current_user_id();
+	} else {
+		$t_user_id = 0;
+	}
+
+	db_query_bound( $t_query, array( $t_user_id, trim( $p_event_text ) ) );
 
 	return db_insert_id( $t_events_table );
 }
@@ -91,7 +97,7 @@ function EventLog_get_page( $p_page_id, $p_per_page ) {
 		$t_event->id = (integer)$t_row['id'];
 		$t_event->user_id = (integer)$t_row['user_id'];
 		$t_event->event = (string)$t_row['event'];
-		$t_event->timestamp = db_unixtimestamp( $t_row['timestamp'] );
+		$t_event->timestamp = $t_row['timestamp'];
 
 		$t_events[] = $t_event;
 	}
