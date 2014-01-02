@@ -39,8 +39,8 @@ class EventLogPlugin extends MantisPlugin {
 		);
 
 		$this->author		= 'Victor Boctor';
-		$this->contact		= 'vboctor@users.sourceforge.net';
-		$this->url			= 'http://www.mantisbt.org';
+		$this->contact		= 'victor@mantishub.com';
+		$this->url			= 'http://www.mantishub.com';
 	}
 
 	/**
