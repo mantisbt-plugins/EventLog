@@ -31,7 +31,6 @@ class EventLogPlugin extends MantisPlugin {
 	function register() {
 		$this->name		= plugin_lang_get( 'title' );
 		$this->description	= plugin_lang_get( 'description' );
-		$this->page		= 'config';
 
 		$this->version		= '1.0';
 		$this->requires		= array(
