@@ -47,12 +47,16 @@ echo '<input type="submit" name="submit" value="', plugin_lang_get( 'clear_event
 echo '</form>';
 echo '</div>';
 
+echo '<div class="table-container">';
 echo '<table class="width100">';
+echo '<thead>';
 echo '<tr class="row-category">';
 echo '<th>', lang_get( 'timestamp' ), '</th>';
 echo '<th>', lang_get( 'username' ), '</th>';
 echo '<th>', plugin_lang_get( 'event' ), '</th>';
 echo '</tr>';
+echo '</thead>';
+echo '<tbody>';
 
 foreach ( $t_events as $t_event ) {
 	$t_event_text = $t_event->event;
@@ -60,12 +64,14 @@ foreach ( $t_events as $t_event ) {
 	$t_event_text = string_process_generic_link( $t_event_text, '@U', 'user' ); 
 	$t_event_text = string_process_generic_link( $t_event_text, '@P', 'project' ); 
 
-	echo '<tr ', helper_alternate_class(), '>';
+	echo '<tr>';
 	echo '<td width="10%">', date( config_get( 'complete_date_format' ), $t_event->timestamp ), '</td>';
 	echo '<td width="10%">', print_user( $t_event->user_id ), '</td>';
 	echo '<td>', $t_event_text, '</td>';
 	echo '</tr>';
 }
 
+echo '</tbody>';
 echo '</table>';
+echo '</div>';
 html_page_bottom1( __FILE__ );
