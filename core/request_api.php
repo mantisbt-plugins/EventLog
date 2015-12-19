@@ -126,7 +126,7 @@ function request_format( $p_requests ) {
 
 		foreach( $t_events as $t_event ) {
 			$t_event_text = $t_event->event;
-			$t_event_text = string_display( $t_event_text );
+			$t_event_text = string_display_links( $t_event_text );
 			$t_event_text = string_process_generic_link( $t_event_text, '@U', 'user' );
 			$t_event_text = string_process_generic_link( $t_event_text, '@P', 'project' );
 
