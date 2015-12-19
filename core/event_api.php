@@ -22,11 +22,6 @@ class EventLog
 	var $id = 0;
 
 	/**
-	 * The user id.
-	 */
-	var $user_id = 0;
-
-	/**
 	 * The string of the event.
 	 */
 	var $event = '';
@@ -39,65 +34,39 @@ class EventLog
 
 /**
  * Adds a tweet.  This functional sets the submitted / last updated timestamps to now.
- * 
+ *
+ * @param integer $p_request_id  The page request id.
  * @param string $p_event_text   The text of the event log.
  * @returns int  Id of the added event, or -1 if event skipped. 
  */
-function EventLog_add( $p_event_text ) {
-	if ( is_blank( $p_event_text ) ) {
-		return -1;
-	}
-
+function event_add($p_request_id, $p_event_text ) {
 	$t_events_table = plugin_table( 'events' );
 
-	$t_query = "INSERT INTO $t_events_table ( user_id, event, timestamp ) VALUES (" . db_param( 0 ) . ", " . db_param( 1 ) . ", '" . db_now() . "')";
+	$t_query = "INSERT INTO $t_events_table ( request_id, event, timestamp ) VALUES (" . db_param() . ", " . db_param() . ", '" . db_now() . "')";
 
-	if ( auth_is_user_authenticated() ) {
-		$t_user_id = auth_get_current_user_id();
-	} else {
-		$t_user_id = 0;
-	}
-
-	db_query( $t_query, array( $t_user_id, trim( $p_event_text ) ) );
+	db_query( $t_query, array( $p_request_id, trim( $p_event_text ) ) );
 
 	return db_insert_id( $t_events_table );
 }
 
 /**
- * Clears the event log.
+ * Gets the events associated with the specified request id.
+ * @param integer $p_request_id The request id.
+ * @return array events associated with specified request id.
  */
-function EventLog_clear() {
+function event_get_by_request_id( $p_request_id ) {
 	$t_events_table = plugin_table( 'events' );
 
-	$t_query = "DELETE FROM $t_events_table";
-
-	db_query( $t_query, array() );
-}
-
-/**
- * Gets the events on a page given the page number (1 based)
- * and the number of events per page.
- * 
- * @param int $p_page_id   A 1-based page number.
- * @param int $p_per_page  The number of eventsto display per page.
- * 
- * @returns Array of EventLog class instances. 
- */
-function EventLog_get_page( $p_page_id, $p_per_page ) {
-	$t_events_table = plugin_table( 'events' );
-	$t_offset = ( $p_page_id - 1 ) * $p_per_page;
-
-	$t_query = "SELECT * FROM $t_events_table ORDER BY timestamp DESC";
-	$t_result = db_query( $t_query, null, $p_per_page, $t_offset );
+	$t_query = 'SELECT * FROM ' . $t_events_table . ' WHERE request_id=' . db_param() . ' ORDER BY timestamp ASC';
+	$t_result = db_query( $t_query, array( $p_request_id ) );
 
 	$t_events = array();
 
 	while ( $t_row = db_fetch_array( $t_result ) ) {
 		$t_event = new EventLog();
-		$t_event->id = (integer)$t_row['id'];
-		$t_event->user_id = (integer)$t_row['user_id'];
-		$t_event->event = (string)$t_row['event'];
-		$t_event->timestamp = $t_row['timestamp'];
+		$t_event->id = (int)$t_row['id'];
+		$t_event->event = $t_row['event'];
+		$t_event->timestamp = (int)$t_row['timestamp'];
 
 		$t_events[] = $t_event;
 	}
@@ -106,17 +75,14 @@ function EventLog_get_page( $p_page_id, $p_per_page ) {
 }
 
 /**
- * Gets the total number of events in the database.
- * 
- * @returns the number of events.
+ * Clears the event log.
  */
-function EventLog_get_events_count() {
+function event_clear() {
 	$t_events_table = plugin_table( 'events' );
 
-	$t_query = "SELECT count(*) FROM $t_events_table";
-	$t_result = db_query( $t_query, null );
+	$t_query = "DELETE FROM $t_events_table";
 
-	return db_result( $t_result );
+	db_query( $t_query, array() );
 }
 
 # --------------------

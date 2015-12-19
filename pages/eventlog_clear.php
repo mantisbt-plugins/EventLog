@@ -11,11 +11,13 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-require_once( config_get( 'plugin_path' ) . 'EventLog' . DIRECTORY_SEPARATOR . 'EventLog_api.php' ); 
+require_once( config_get( 'plugin_path' ) . 'EventLog/core/request_api.php' );
+require_once( config_get( 'plugin_path' ) . 'EventLog/core/event_api.php' );
 
 access_ensure_global_level( plugin_config_get( 'view_threshold' ) ); 
 
-EventLog_clear();
+event_clear_all();
+request_clear_all();
 
 $t_redirect_url = plugin_page( 'index', /* redirect */ true );
 

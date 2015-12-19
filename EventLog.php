@@ -19,12 +19,16 @@
 
 require_once( config_get( 'absolute_path' ) . 'core.php' );
 require_once( config_get( 'class_path' ) . 'MantisPlugin.class.php' );
-require_once( config_get( 'plugin_path' ) . 'EventLog' . DIRECTORY_SEPARATOR . 'EventLog_api.php' ); 
+require_once( config_get( 'plugin_path' ) . 'EventLog/core/request_api.php' );
+require_once( config_get( 'plugin_path' ) . 'EventLog/core/event_api.php' );
 
 /**
  * A plugin that manages an event log in the database.
  */
 class EventLogPlugin extends MantisPlugin {
+	private $request_id = null;
+	private $request_timestamp = null;
+
 	/**
 	 *  A method that populates the plugin information and minimum requirements.
 	 */
@@ -71,12 +75,36 @@ class EventLogPlugin extends MantisPlugin {
 			),
 			array( 'CreateTableSQL',
 				array( plugin_table( 'events' ), "
-					id				I		NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-					user_id			I		NOTNULL UNSIGNED DEFAULT '0',
-					event			C(250)	NOTNULL,
-					timestamp		I UNSIGNED NOTNULL DEFAULT '1'
+					id				I NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+					user_id			I NOTNULL UNSIGNED DEFAULT '0',
+					event			C(250) NOTNULL,
+					timestamp		I UNSIGNED NOTNULL DEFAULT '0'
 				" )
 			),
+			array( 'DropTableSQL',
+				array( plugin_table( 'events' ) )
+			),
+			array( 'CreateTableSQL',
+				array( plugin_table( 'requests' ), "
+					id				I NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+					timestamp		I UNSIGNED NOTNULL DEFAULT '0',
+					user_id			I NOTNULL UNSIGNED DEFAULT '0'
+				" )
+			),
+			array( 'CreateIndexSQL',
+				array( 'idx_timestamp', plugin_table( 'requests' ), 'timestamp' )
+			),
+			array( 'CreateTableSQL',
+				array( plugin_table( 'events' ), "
+					id				I NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+					request_id		I NOTNULL UNSIGNED DEFAULT '0',
+					timestamp		I UNSIGNED NOTNULL DEFAULT '0',
+					event			C(250) NOTNULL
+				" )
+			),
+			array( 'CreateIndexSQL',
+				array( 'idx_request_id', plugin_table( 'events' ), 'request_id' )
+			)
 		);
 	}
 
@@ -93,7 +121,16 @@ class EventLogPlugin extends MantisPlugin {
 	}
 
 	function process_log( $p_event_name, $p_event_string ) {
-		EventLog_add( $p_event_string );
+		if ( is_blank( $p_event_string ) ) {
+			return;
+		}
+
+		if ( $this->request_timestamp === null ) {
+			$this->request_timestamp = time();
+			$this->request_id = request_add( $this->request_timestamp );
+		}
+
+		event_add( $this->request_id, $p_event_string );
 	}
 
 	/**

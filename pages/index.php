@@ -11,9 +11,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-require_once( config_get( 'plugin_path' ) . 'EventLog' . DIRECTORY_SEPARATOR . 'EventLog_api.php' ); 
+require_once( config_get( 'plugin_path' ) . 'EventLog/core/request_api.php' );
+require_once( config_get( 'plugin_path' ) . 'EventLog/core/event_api.php' );
 
-access_ensure_global_level( plugin_config_get( 'view_threshold' ) ); 
+access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 
 $f_page_id = gpc_get_int( 'page_id', 1 );
 
@@ -21,27 +22,25 @@ html_page_top1( plugin_lang_get( 'title' ) );
 html_page_top2();
 
 $t_per_page = 100;
-$t_total_count = EventLog_get_events_count();
+$t_total_count = request_count();
 $t_total_pages_count = (integer)(( $t_total_count + ( $t_per_page - 1 ) ) / $t_per_page);
 
-$t_events = EventLog_get_page( $f_page_id, $t_per_page );
+$t_requests = request_get_page( $f_page_id, $t_per_page );
+$t_formatted_requests = request_format( $t_requests );
 
 echo '<br /><div align="center">';
 
 if ( $f_page_id > 1 ) {
 	echo '[ <a href="', plugin_page( 'index' ), '&amp;page_id=', (int)($f_page_id) - 1, '">', plugin_lang_get( 'newer_events' ), '</a> ]&nbsp;';
-} else {
-	echo '[ ', plugin_lang_get( 'newer_events' ), ' ]&nbsp;';
 }
 
 if ( $f_page_id < $t_total_pages_count ) {
 	echo '[ <a href="', plugin_page( 'index' ), '&amp;page_id=', (int)( $f_page_id ) + 1, '">', plugin_lang_get( 'older_events' ), '</a> ]';
-} else {
-	echo '[ ', plugin_lang_get( 'older_events' ), ' ]';
 }
+
 echo '</div>';
 
-echo '<div align="right">';
+echo '<div align="center">';
 echo '<form method="post" action="', plugin_page ( 'eventlog_clear' ), '">';
 echo '<input type="submit" name="submit" value="', plugin_lang_get( 'clear_events' ), '" />';
 echo '</form>';
@@ -51,6 +50,7 @@ echo '<div class="table-container">';
 echo '<table class="width100">';
 echo '<thead>';
 echo '<tr class="row-category">';
+echo '<th>', lang_get( 'id' ), '</th>';
 echo '<th>', lang_get( 'timestamp' ), '</th>';
 echo '<th>', lang_get( 'username' ), '</th>';
 echo '<th>', plugin_lang_get( 'event' ), '</th>';
@@ -58,16 +58,12 @@ echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
 
-foreach ( $t_events as $t_event ) {
-	$t_event_text = $t_event->event;
-	$t_event_text = string_display( $t_event_text );
-	$t_event_text = string_process_generic_link( $t_event_text, '@U', 'user' ); 
-	$t_event_text = string_process_generic_link( $t_event_text, '@P', 'project' ); 
-
+foreach ( $t_formatted_requests as $t_request ) {
 	echo '<tr>';
-	echo '<td width="10%">', date( config_get( 'complete_date_format' ), $t_event->timestamp ), '</td>';
-	echo '<td width="10%">', print_user( $t_event->user_id ), '</td>';
-	echo '<td>', $t_event_text, '</td>';
+	echo '<td style="vertical-align: top;">', $t_request['id'], '</td>';
+	echo '<td style="vertical-align: top;">', $t_request['timestamp'], '</td>';
+	echo '<td style="vertical-align: top;">', $t_request['user'], '</td>';
+	echo '<td style="vertical-align: top;">', $t_request['events'], '</td>';
 	echo '</tr>';
 }
 
