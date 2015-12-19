@@ -58,7 +58,7 @@ function EventLog_add( $p_event_text ) {
 		$t_user_id = 0;
 	}
 
-	db_query_bound( $t_query, array( $t_user_id, trim( $p_event_text ) ) );
+	db_query( $t_query, array( $t_user_id, trim( $p_event_text ) ) );
 
 	return db_insert_id( $t_events_table );
 }
@@ -71,7 +71,7 @@ function EventLog_clear() {
 
 	$t_query = "DELETE FROM $t_events_table";
 
-	db_query_bound( $t_query, array() );
+	db_query( $t_query, array() );
 }
 
 /**
@@ -88,7 +88,7 @@ function EventLog_get_page( $p_page_id, $p_per_page ) {
 	$t_offset = ( $p_page_id - 1 ) * $p_per_page;
 
 	$t_query = "SELECT * FROM $t_events_table ORDER BY timestamp DESC";
-	$t_result = db_query_bound( $t_query, null, $p_per_page, $t_offset );
+	$t_result = db_query( $t_query, null, $p_per_page, $t_offset );
 
 	$t_events = array();
 
@@ -114,7 +114,7 @@ function EventLog_get_events_count() {
 	$t_events_table = plugin_table( 'events' );
 
 	$t_query = "SELECT count(*) FROM $t_events_table";
-	$t_result = db_query_bound( $t_query, null );
+	$t_result = db_query( $t_query, null );
 
 	return db_result( $t_result );
 }
