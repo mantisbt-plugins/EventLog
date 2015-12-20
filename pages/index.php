@@ -18,8 +18,8 @@ access_ensure_global_level( plugin_config_get( 'view_threshold' ) );
 
 $f_page_id = gpc_get_int( 'page_id', 1 );
 
-html_page_top1( plugin_lang_get( 'title' ) );
-html_page_top2();
+layout_page_header( plugin_lang_get( 'title' ) );
+layout_page_begin();
 
 $t_per_page = 100;
 $t_total_count = request_count();
@@ -46,8 +46,10 @@ echo '<input type="submit" name="submit" value="', plugin_lang_get( 'clear_event
 echo '</form>';
 echo '</div>';
 
-echo '<div class="table-container">';
-echo '<table class="width100">';
+echo '<div class="col-md-12 col-xs-12">';
+echo '<div class="space-10"></div>';
+echo '<div class="table-responsive">';
+echo '<table class="table table-bordered table-condensed table-hover table-striped">';
 echo '<thead>';
 echo '<tr class="row-category">';
 echo '<th>', lang_get( 'id' ), '</th>';
@@ -70,4 +72,7 @@ foreach ( $t_formatted_requests as $t_request ) {
 echo '</tbody>';
 echo '</table>';
 echo '</div>';
-html_page_bottom1( __FILE__ );
+echo '</div>';
+echo '</div>';
+
+layout_page_end();

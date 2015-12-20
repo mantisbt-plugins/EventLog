@@ -77,7 +77,7 @@ function event_get_by_request_id( $p_request_id ) {
 /**
  * Clears the event log.
  */
-function event_clear() {
+function event_clear_all() {
 	$t_events_table = plugin_table( 'events' );
 
 	$t_query = "DELETE FROM $t_events_table";

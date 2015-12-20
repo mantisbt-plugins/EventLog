@@ -21,13 +21,13 @@ request_clear_all();
 
 $t_redirect_url = plugin_page( 'index', /* redirect */ true );
 
-html_page_top1();
-html_meta_redirect( $t_redirect_url );
-html_page_top2();
+layout_page_header( plugin_lang_get( 'title' ) );
+layout_page_begin( $t_redirect_url );
 
 echo '<br /><div align="center">';
 echo lang_get( 'operation_successful' ).'<br />';
-print_bracket_link( $t_redirect_url, lang_get( 'proceed' ) );
+print_button( $t_redirect_url, lang_get( 'proceed' ) );
 echo '</div>';
 
-html_page_bottom1( __FILE__ );
+layout_page_end();
+
