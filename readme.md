@@ -24,3 +24,5 @@ $g_log_level = LOG_EMAIL | LOG_EMAIL_RECIPIENT
 
 - Supports MantisBT v1.2.x -- use master-1.2.x branch
 - Supports MantisBT v1.3.x -- use master branch
+- Supports MantisBT v2.x.x (modern ui) -- use master-modernui
+
