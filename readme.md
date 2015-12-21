@@ -16,6 +16,12 @@ $g_log_level = LOG_EMAIL | LOG_EMAIL_RECIPIENT
 
 - Go to the event log view by clicking: Manage - Event log
 
+# Demo
+
+You can see a demo of it on [MantisHub](http://www.mantishub.com) where it is used to help administrators
+understand email notifications, answering questions like why did user X receive or didn't receive an email
+notification for issue Y.
+
 # Screenshot
 
 ![EventLog Screentshot](wiki/eventlog_screenshot.png "EventLog Screentshot")
@@ -24,5 +30,5 @@ $g_log_level = LOG_EMAIL | LOG_EMAIL_RECIPIENT
 
 - Supports MantisBT v1.2.x -- use master-1.2.x branch
 - Supports MantisBT v1.3.x -- use master branch
-- Supports MantisBT v2.x.x (modern ui) -- use master-modernui
+- Supports MantisBT v1.3.x (modern ui) -- use master-modernui branch
 
