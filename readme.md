@@ -18,7 +18,7 @@ $g_log_level = LOG_EMAIL | LOG_EMAIL_RECIPIENT
 
 # Screenshot
 
-![EventLog Screentshot](http://d3j5vwomefv46c.cloudfront.net/photos/large/831246014.png?1388635355 "EventLog Screentshot")
+![EventLog Screentshot](wiki/eventlog_screenshot.png "EventLog Screentshot")
 
 # Compatibility
 
