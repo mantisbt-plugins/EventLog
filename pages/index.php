@@ -73,6 +73,5 @@ echo '</tbody>';
 echo '</table>';
 echo '</div>';
 echo '</div>';
-echo '</div>';
 
 layout_page_end();
