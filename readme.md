@@ -30,5 +30,5 @@ notification for issue Y.
 
 - Supports MantisBT v1.2.x -- use master-1.2.x branch
 - Supports MantisBT v1.3.x -- use master branch
-- Supports MantisBT v1.3.x (modern ui) -- use master-modernui branch
+- Supports MantisBT v2.x (modern ui) -- use master-modernui branch
 
