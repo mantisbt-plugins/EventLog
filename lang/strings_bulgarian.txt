@@ -12,11 +12,11 @@
 # GNU General Public License for more details.
 
 $s_plugin_EventLog_index = 'EventLog';
-$s_plugin_EventLog_menu_item = 'Регистър на събитията';
-$s_plugin_EventLog_title = 'Регистър на събитията';
-$s_plugin_EventLog_title_full = 'MantisBT Регистър на събитията';
-$s_plugin_EventLog_description = 'MantisBT Регистър на събитията е добавка към MantisBT която прихваща и записва резултатите от различни действия.';
-$s_plugin_EventLog_event = 'Събитие';
-$s_plugin_EventLog_newer_events = 'Нови събития';
-$s_plugin_EventLog_older_events = 'Стари Събития';
-$s_plugin_EventLog_clear_events = 'Изчисти всички събития';
+$s_plugin_EventLog_menu_item = 'Р РµРіРёСЃС‚СЉСЂ РЅР° СЃСЉР±РёС‚РёСЏС‚Р°';
+$s_plugin_EventLog_title = 'Р РµРіРёСЃС‚СЉСЂ РЅР° СЃСЉР±РёС‚РёСЏС‚Р°';
+$s_plugin_EventLog_title_full = 'MantisBT Р РµРіРёСЃС‚СЉСЂ РЅР° СЃСЉР±РёС‚РёСЏС‚Р°';
+$s_plugin_EventLog_description = 'MantisBT Р РµРіРёСЃС‚СЉСЂ РЅР° СЃСЉР±РёС‚РёСЏС‚Р° Рµ РґРѕР±Р°РІРєР° РєСЉРј MantisBT РєРѕСЏС‚Рѕ РїСЂРёС…РІР°С‰Р° Рё Р·Р°РїРёСЃРІР° СЂРµР·СѓР»С‚Р°С‚РёС‚Рµ РѕС‚ СЂР°Р·Р»РёС‡РЅРё РґРµР№СЃС‚РІРёСЏ.';
+$s_plugin_EventLog_event = 'РЎСЉР±РёС‚РёРµ';
+$s_plugin_EventLog_newer_events = 'РќРѕРІРё СЃСЉР±РёС‚РёСЏ';
+$s_plugin_EventLog_older_events = 'РЎС‚Р°СЂРё РЎСЉР±РёС‚РёСЏ';
+$s_plugin_EventLog_clear_events = 'РР·С‡РёСЃС‚Рё РІСЃРёС‡РєРё СЃСЉР±РёС‚РёСЏ';
