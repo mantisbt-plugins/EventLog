@@ -26,7 +26,7 @@ layout_page_begin( $t_redirect_url );
 
 echo '<br /><div align="center">';
 echo lang_get( 'operation_successful' ).'<br />';
-print_button( $t_redirect_url, lang_get( 'proceed' ) );
+print_form_button( $t_redirect_url, lang_get( 'proceed' ) );
 echo '</div>';
 
 layout_page_end();
