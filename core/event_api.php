@@ -100,33 +100,38 @@ function event_clear_all() {
 #
 # if $p_include_anchor = false, $p_fqdn is ignored and assumed to true.
 
-$eventlog_string_process_user_link_callback = null;
-$eventlog_string_process_project_link_callback = null;
-
 function string_process_generic_link( $p_string, $p_tag, $p_type ) {
-	$t_callback = 'eventlog_string_process_' . $p_type . '_link_callback';
-	global $$t_callback;
-
-	$t_tag = $p_tag;
+	static $s_callback;
+	if( $s_callback === null ) {
+		/**
+		 * Replace user (@Uxxx) or project ID (@Pxxx) references.
+		 *
+		 * @param array $p_matches
+		 *
+		 * @return mixed|string
+		 * @uses string $p_type 'user' or 'project'
+		 */
+		$s_callback = function( array $p_matches ) use ( $p_type ) {
+			$t_exists_function = $p_type . '_exists';
+			if( $t_exists_function( (int)$p_matches[2] ) ) {
+				$t_get_field_function = $p_type . '_get_field';
+				$t_field_name = $p_type == 'user' ? 'username' : 'name';
+				$t_value = $t_get_field_function( (int)$p_matches[2], $t_field_name );
+				return ' <strong>' . $t_value . '</strong>';
+			} else {
+				return $p_matches[2];
+			}
+		};
+	}
 
 	# bail if the link tag is blank
-	if ( '' == $t_tag || $p_string == '' ) {
+	if ( '' == $p_tag || $p_string == '' ) {
 		return $p_string;
 	}
 
-	if ( !isset( $$t_callback ) ) {
-		$$t_callback = create_function( '$p_array', '
-											$t_exists = \'' . $p_type . '_exists\';
-											if ( $t_exists( (int)$p_array[2] ) ) {
-												$t_get_field = \'' . $p_type . '_get_field\';
-												$t_name = $t_get_field( (int)$p_array[2], \'' . ( ( $p_type == 'user' ) ? 'username' : 'name' ) . '\' );
-												return \' <b>\' . $t_name . \'</b>\';
-											} else {
-												return $p_array[2];
-											}
-											' );
-	}
-
-	return preg_replace_callback( '/(^|[^\w])' . preg_quote( $t_tag, '/' ) . '(\d+)\b/', $$t_callback, $p_string );
+	return preg_replace_callback( '/(^|\W)' . preg_quote( $p_tag, '/' ) . '(\d+)\b/',
+		$s_callback,
+		$p_string
+	);
 }
 
