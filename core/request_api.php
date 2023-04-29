@@ -40,6 +40,8 @@ class EventLogRequest
  * @return integer The request id.
  */
 function request_add( $p_request_timestamp ) {
+	db_param_push();
+
 	$t_requests_table = plugin_table( 'requests' );
 
 	$t_query = "INSERT INTO $t_requests_table ( user_id, timestamp ) VALUES (" . db_param() . ", " . db_param() . ")";
@@ -52,7 +54,11 @@ function request_add( $p_request_timestamp ) {
 
 	db_query( $t_query, array( $t_user_id, $p_request_timestamp ) );
 
-	return db_insert_id( $t_requests_table );
+	$t_request_id = db_insert_id( $t_requests_table );
+
+	db_param_pop();
+
+	return $t_request_id;
 }
 
 /**
@@ -61,12 +67,18 @@ function request_add( $p_request_timestamp ) {
  * @return integer the number of event log requests.
  */
 function request_count() {
+	db_param_push();
+
 	$t_requests_table = plugin_table( 'requests' );
 
 	$t_query = "SELECT count(*) FROM $t_requests_table";
 	$t_result = db_query( $t_query, null );
 
-	return db_result( $t_result );
+	$t_count = db_result( $t_result );
+
+	db_param_pop();
+
+	return $t_count;
 }
 
 /**
@@ -79,6 +91,8 @@ function request_count() {
  * @return array The request instances.
  */
 function request_get_page( $p_page_id, $p_per_page ) {
+	db_param_push();
+
 	$t_requests_table = plugin_table( 'requests' );
 	$t_offset = ( $p_page_id - 1 ) * $p_per_page;
 
@@ -95,6 +109,8 @@ function request_get_page( $p_page_id, $p_per_page ) {
 
 		$t_requests[] = $t_request;
 	}
+
+	db_param_pop();
 
 	return $t_requests;
 }
@@ -149,8 +165,27 @@ function request_format( $p_requests ) {
  * @return void
  */
 function request_clear_all() {
+	db_param_push();
+
 	$t_requests_table = plugin_table( 'requests' );
 	$t_query = "DELETE FROM $t_requests_table";
 	db_query( $t_query, array() );
+
+	db_param_pop();
 }
 
+/**
+ * Delete all requests older than a given timestamp.
+ *
+ * @param integer $p_timestamp The timestamp.
+ * @return void
+ */
+function request_trim( $p_timestamp ) {
+	db_param_push();
+
+	$c_timestamp = (int)$p_timestamp;
+	$t_query = "DELETE FROM " . plugin_table( 'requests' ) . " WHERE timestamp < $c_timestamp";
+	db_query( $t_query );
+
+	db_param_pop();
+}

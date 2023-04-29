@@ -40,13 +40,19 @@ class EventLog
  * @return integer Id of the added event, or -1 if event skipped. 
  */
 function event_add($p_request_id, $p_event_text ) {
+	db_param_push();
+
 	$t_events_table = plugin_table( 'events' );
 
 	$t_query = "INSERT INTO $t_events_table ( request_id, event, timestamp ) VALUES (" . db_param() . ", " . db_param() . ", '" . db_now() . "')";
 
 	db_query( $t_query, array( $p_request_id, trim( $p_event_text ) ) );
 
-	return db_insert_id( $t_events_table );
+	$t_event_id = db_insert_id( $t_events_table );
+
+	db_param_pop();
+
+	return $t_event_id;
 }
 
 /**
@@ -55,6 +61,8 @@ function event_add($p_request_id, $p_event_text ) {
  * @return array events associated with specified request id.
  */
 function event_get_by_request_id( $p_request_id ) {
+	db_param_push();
+
 	$t_events_table = plugin_table( 'events' );
 
 	$t_query = 'SELECT * FROM ' . $t_events_table . ' WHERE request_id=' . db_param() . ' ORDER BY timestamp ASC';
@@ -71,6 +79,8 @@ function event_get_by_request_id( $p_request_id ) {
 		$t_events[] = $t_event;
 	}
 
+	db_param_pop();
+
 	return $t_events;
 }
 
@@ -79,11 +89,15 @@ function event_get_by_request_id( $p_request_id ) {
  * @return void
  */
 function event_clear_all() {
+	db_param_push();
+
 	$t_events_table = plugin_table( 'events' );
 
 	$t_query = "DELETE FROM $t_events_table";
 
 	db_query( $t_query, array() );
+
+	db_param_pop();
 }
 
 /**
@@ -130,3 +144,18 @@ function string_process_generic_link( $p_string, $p_tag, $p_type ) {
 	);
 }
 
+/**
+ * Delete all events older than a given timestamp.
+ *
+ * @param integer $p_timestamp The timestamp.
+ * @return void
+ */
+function event_trim( $p_timestamp ) {
+	db_param_push();
+
+	$c_timestamp = (int)$p_timestamp;
+	$t_query = "DELETE FROM " . plugin_table( 'events' ) . " WHERE timestamp < $c_timestamp";
+	db_query( $t_query );
+
+	db_param_pop();
+}

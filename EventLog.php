@@ -54,6 +54,7 @@ class EventLogPlugin extends MantisPlugin {
 			'view_threshold'	=>	ADMINISTRATOR,
 			'manage_threshold'	=>	ADMINISTRATOR,
 			'delete_after_in_days' => 1,
+			'retention_days' => 7
 		);
 	}
 
@@ -123,7 +124,21 @@ class EventLogPlugin extends MantisPlugin {
 		return array(
 			'EVENT_MENU_MANAGE' => 'process_main_menu', # Main Menu
 			'EVENT_LOG' => 'process_log',
+			'EVENT_CRONJOB' => 'trim_events',
+			'EVENT_REPORT_BUG' => 'trim_events'  # just in case cronjob is not setup
 		);
+	}
+
+	/**
+	 * Delete requests and events older than N days.
+	 */
+	function trim_events() {
+		$t_retention_days = plugin_config_get( 'retention_days' );
+		if ( $t_retention_days > 0 ) {
+			$t_trim_timestamp = time() - ( $t_retention_days * 24 * 60 * 60 );
+			request_trim( $t_trim_timestamp );
+			event_trim( $t_trim_timestamp );
+		}
 	}
 
 	function process_log( $p_event_name, $p_event_string ) {
