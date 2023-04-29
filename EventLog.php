@@ -104,6 +104,12 @@ class EventLogPlugin extends MantisPlugin {
 			),
 			array( 'CreateIndexSQL',
 				array( 'idx_request_id', plugin_table( 'events' ), 'request_id' )
+			),
+			array( 'AlterColumnSQL',
+				array(
+					plugin_table( 'events' ),
+					"event XL NULL DEFAULT NULL"
+				)
 			)
 		);
 	}
