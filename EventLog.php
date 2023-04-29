@@ -125,7 +125,7 @@ class EventLogPlugin extends MantisPlugin {
 			'EVENT_MENU_MANAGE' => 'process_main_menu', # Main Menu
 			'EVENT_LOG' => 'process_log',
 			'EVENT_CRONJOB' => 'trim_events',
-			'EVENT_REPORT_BUG' => 'trim_events'  # just in case cronjob is not setup
+			'EVENT_REPORT_BUG_FORM_TOP' => 'trim_events' # just in case cronjob not setup
 		);
 	}
 
