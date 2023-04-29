@@ -111,7 +111,7 @@ class EventLogPlugin extends MantisPlugin {
 	/**
 	 * Event hook declaration.
 	 * 
-	 * @returns An associated array that maps event names to handler names.
+	 * @return array An associated array that maps event names to handler names.
 	 */
 	function hooks() {
 		return array(
@@ -136,7 +136,7 @@ class EventLogPlugin extends MantisPlugin {
 	/**
 	 * If current logged in user can view EventLog, then add a menu option to the main menu.
 	 * 
-	 * @returns An array containing the hyper link.
+	 * @return array An array containing the hyper link.
 	 */
 	function process_main_menu() {
 		if ( access_has_global_level( plugin_config_get( 'view_threshold' ) ) ) {

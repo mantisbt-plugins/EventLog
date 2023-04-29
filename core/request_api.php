@@ -58,7 +58,7 @@ function request_add( $p_request_timestamp ) {
 /**
  * Gets the total number of event log requests in the database.
  *
- * @returns integer the number of event log requests.
+ * @return integer the number of event log requests.
  */
 function request_count() {
 	$t_requests_table = plugin_table( 'requests' );
@@ -76,7 +76,7 @@ function request_count() {
  * @param int $p_page_id   A 1-based page number.
  * @param int $p_per_page  The number of eventsto display per page.
  *
- * @returns Array of Request class instances.
+ * @return array The request instances.
  */
 function request_get_page( $p_page_id, $p_per_page ) {
 	$t_requests_table = plugin_table( 'requests' );

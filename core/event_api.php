@@ -37,7 +37,7 @@ class EventLog
  *
  * @param integer $p_request_id  The page request id.
  * @param string $p_event_text   The text of the event log.
- * @returns int  Id of the added event, or -1 if event skipped. 
+ * @return integer Id of the added event, or -1 if event skipped. 
  */
 function event_add($p_request_id, $p_event_text ) {
 	$t_events_table = plugin_table( 'events' );
@@ -86,20 +86,15 @@ function event_clear_all() {
 	db_query( $t_query, array() );
 }
 
-# --------------------
-# Process $p_string, looking for bugnote ID references and creating bug view
-#  links for them.
-#
-# Returns the processed string.
-#
-# If $p_include_anchor is true, include the href tag, otherwise just insert
-#  the URL
-#
-# The bugnote tag ('~' by default) must be at the beginning of the string or
-#  preceeded by a character that is not a letter, a number or an underscore
-#
-# if $p_include_anchor = false, $p_fqdn is ignored and assumed to true.
-
+/**
+ * Process string to replace tag with ids with corresponding links.
+ *
+ * @param string $p_string the string to process
+ * @param string $p_tag The tag, e.g. '@U' for user or '@P' for project.
+ * @param string $p_type 'user' or 'project'
+ *
+ * @return string the processed string.
+ */
 function string_process_generic_link( $p_string, $p_tag, $p_type ) {
 	static $s_callback;
 	if( $s_callback === null ) {
