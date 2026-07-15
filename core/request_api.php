@@ -141,10 +141,7 @@ function request_format( $p_requests ) {
 		$t_events_text = '';
 
 		foreach( $t_events as $t_event ) {
-			$t_event_text = $t_event->event;
-			$t_event_text = string_display_links( $t_event_text );
-			$t_event_text = string_process_generic_link( $t_event_text, '@U', 'user' );
-			$t_event_text = string_process_generic_link( $t_event_text, '@P', 'project' );
+			$t_event_text = event_string_to_html( $t_event->event );
 
 			if ( is_blank( $t_events_text ) ) {
 				$t_events_text = $t_event_text;
@@ -158,6 +155,64 @@ function request_format( $p_requests ) {
 	}
 
 	return $t_formatted_requests;
+}
+
+/**
+ * Build the REST representation of a page of event log requests, together with
+ * pagination metadata. Each request carries its user reference and, for every
+ * associated event, only the sanitized HTML (display links and @U/@P user /
+ * project references already resolved). The raw event text is intentionally
+ * omitted so a client can never accidentally render unescaped content.
+ *
+ * Must be called with the EventLog plugin as the current plugin context, since
+ * the underlying data functions resolve their table names via plugin_table().
+ *
+ * @param int $p_page      A 1-based page number.
+ * @param int $p_per_page  The number of requests per page.
+ * @return array An array with 'requests' and 'pagination' keys.
+ */
+function request_rest_list( $p_page, $p_per_page ) {
+	$t_total = (int)request_count();
+	$t_total_pages = max( 1, (int)ceil( $t_total / $p_per_page ) );
+	$t_page = min( max( 1, (int)$p_page ), $t_total_pages );
+
+	$t_requests = request_get_page( $t_page, $p_per_page );
+
+	$t_formatted = array();
+	foreach ( $t_requests as $t_request ) {
+		$t_events = event_get_by_request_id( $t_request->id );
+
+		$t_formatted_events = array();
+		foreach ( $t_events as $t_event ) {
+			$t_formatted_events[] = array(
+				'id' => (int)$t_event->id,
+				'timestamp' => ApiObjectFactory::datetimeString( (int)$t_event->timestamp ),
+				'event_html' => event_string_to_html( $t_event->event ),
+			);
+		}
+
+		$t_user_id = (int)$t_request->user_id;
+		$t_user = ( $t_user_id > 0 && user_exists( $t_user_id ) )
+			? mci_account_get_array_by_id( $t_user_id )
+			: null;
+
+		$t_formatted[] = array(
+			'id' => (int)$t_request->id,
+			'timestamp' => ApiObjectFactory::datetimeString( (int)$t_request->timestamp ),
+			'user' => $t_user,
+			'events' => $t_formatted_events,
+		);
+	}
+
+	return array(
+		'requests' => $t_formatted,
+		'pagination' => array(
+			'page' => $t_page,
+			'per_page' => (int)$p_per_page,
+			'total' => $t_total,
+			'total_pages' => $t_total_pages,
+		),
+	);
 }
 
 /**

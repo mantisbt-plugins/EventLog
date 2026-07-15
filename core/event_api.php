@@ -126,7 +126,10 @@ function string_process_generic_link( $p_string, $p_tag, $p_type ) {
 				$t_get_field_function = $p_type . '_get_field';
 				$t_field_name = $p_type == 'user' ? 'username' : 'name';
 				$t_value = $t_get_field_function( (int)$p_matches[2], $t_field_name );
-				return ' <strong>' . $t_value . '</strong>';
+				# Escape the resolved name: this runs after the base text has
+				# already been sanitized, so an unescaped user/project name
+				# containing markup would otherwise be injected into the output.
+				return ' <strong>' . string_html_specialchars( $t_value ) . '</strong>';
 			} else {
 				return $p_matches[2];
 			}
@@ -142,6 +145,23 @@ function string_process_generic_link( $p_string, $p_tag, $p_type ) {
 		$s_callback,
 		$p_string
 	);
+}
+
+/**
+ * Convert a raw event log string into sanitized display HTML: process display
+ * links, then resolve @U user and @P project references. This is the single
+ * place event text is turned into HTML, shared by the web view and the REST
+ * API so both stay consistent.
+ *
+ * @param string $p_event_text The raw event text.
+ * @return string The sanitized HTML.
+ */
+function event_string_to_html( $p_event_text ) {
+	$t_html = string_display_links( $p_event_text );
+	$t_html = string_process_generic_link( $t_html, '@U', 'user' );
+	$t_html = string_process_generic_link( $t_html, '@P', 'project' );
+
+	return $t_html;
 }
 
 /**

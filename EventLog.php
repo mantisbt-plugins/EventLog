@@ -125,7 +125,8 @@ class EventLogPlugin extends MantisPlugin {
 			'EVENT_MENU_MANAGE' => 'process_main_menu', # Main Menu
 			'EVENT_LOG' => 'process_log',
 			'EVENT_CRONJOB' => 'trim_events',
-			'EVENT_REPORT_BUG_FORM_TOP' => 'trim_events' # just in case cronjob not setup
+			'EVENT_REPORT_BUG_FORM_TOP' => 'trim_events', # just in case cronjob not setup
+			'EVENT_REST_API_ROUTES' => 'routes'
 		);
 	}
 
@@ -165,5 +166,93 @@ class EventLogPlugin extends MantisPlugin {
 		}
 
 		return array();
+	}
+
+	/**
+	 * Register the plugin's REST API routes. Exposed so that clients (e.g. the
+	 * MantisHub modern UI) can read and clear the event log directly from the
+	 * plugin instead of a proxying wrapper.
+	 *
+	 *   GET    /api/rest/plugins/EventLog
+	 *   DELETE /api/rest/plugins/EventLog
+	 *
+	 * @param string $p_event_name The event name (EVENT_REST_API_ROUTES).
+	 * @param array  $p_event_args The event arguments, carrying the Slim app.
+	 * @return void
+	 */
+	function routes( $p_event_name, $p_event_args ) {
+		$t_app = $p_event_args['app'];
+		$t_plugin = $this;
+
+		# The plugin name already forms the base path, so routes live at the
+		# group root ('[/]' allows an optional trailing slash).
+		$t_app->group( plugin_route_group(), function() use ( $t_app, $t_plugin ) {
+			$t_app->get(    '[/]', array( $t_plugin, 'rest_event_log_get' ) );
+			$t_app->delete( '[/]', array( $t_plugin, 'rest_event_log_clear' ) );
+		} );
+	}
+
+	/**
+	 * REST handler: return a paginated list of event log requests and their
+	 * events. Requires the plugin's view_threshold.
+	 *
+	 * Query parameters:
+	 *   - page     1-based page number (default 1).
+	 *   - per_page requests per page, clamped to 1..100 (default 10).
+	 *
+	 * @param \Slim\Http\Request  $p_request  The HTTP request.
+	 * @param \Slim\Http\Response $p_response The HTTP response.
+	 * @param array               $p_args     The route parameters.
+	 * @return \Slim\Http\Response
+	 */
+	function rest_event_log_get( \Slim\Http\Request $p_request, \Slim\Http\Response $p_response, array $p_args ) {
+		# The data functions resolve their table names via plugin_table(), so the
+		# EventLog plugin must be the current context while they run.
+		plugin_push_current( 'EventLog' );
+		try {
+			if ( !access_has_global_level( plugin_config_get( 'view_threshold' ) ) ) {
+				throw new \Mantis\Exceptions\ClientException(
+					'Access denied to view the event log',
+					ERROR_ACCESS_DENIED
+				);
+			}
+
+			$t_page = max( 1, (int)$p_request->getParam( 'page', 1 ) );
+			$t_per_page = min( 100, max( 1, (int)$p_request->getParam( 'per_page', 10 ) ) );
+
+			$t_result = request_rest_list( $t_page, $t_per_page );
+		} finally {
+			plugin_pop_current();
+		}
+
+		return $p_response->withStatus( HTTP_STATUS_SUCCESS )->withJson( $t_result );
+	}
+
+	/**
+	 * REST handler: clear the entire event log (all requests and events).
+	 * Requires the plugin's manage_threshold. Returns 204 No Content.
+	 *
+	 * @param \Slim\Http\Request  $p_request  The HTTP request.
+	 * @param \Slim\Http\Response $p_response The HTTP response.
+	 * @param array               $p_args     The route parameters.
+	 * @return \Slim\Http\Response
+	 */
+	function rest_event_log_clear( \Slim\Http\Request $p_request, \Slim\Http\Response $p_response, array $p_args ) {
+		plugin_push_current( 'EventLog' );
+		try {
+			if ( !access_has_global_level( plugin_config_get( 'manage_threshold' ) ) ) {
+				throw new \Mantis\Exceptions\ClientException(
+					'Access denied to clear the event log',
+					ERROR_ACCESS_DENIED
+				);
+			}
+
+			event_clear_all();
+			request_clear_all();
+		} finally {
+			plugin_pop_current();
+		}
+
+		return $p_response->withStatus( HTTP_STATUS_NO_CONTENT );
 	}
 }
